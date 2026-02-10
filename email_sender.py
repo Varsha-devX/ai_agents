@@ -1,31 +1,30 @@
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from secrects import sender_email as SENDER_EMAIL, password, receiver_email as RECEIVER_EMAIL
 
-# sender details
-sender_email = "varsh6362@gmail.com"
-receiver_email = "ssonuprakashks@gmail.com"
-password = "rydj tome vhdd ockp"
 
-# create message
-msg = MIMEMultipart()
-msg["From"] = sender_email
-msg["To"] = receiver_email
-msg["Subject"] = "Test Email from Python"
+def send_email(receiver_email: str, subject: str, content: str):
+    """Send an email to the specified receiver with the given subject and content."""
+    # create message
+    msg = MIMEMultipart()
+    msg["From"] = SENDER_EMAIL
+    msg["To"] = receiver_email
+    msg["Subject"] = subject
 
-body = "Hello Varsha, this email is sent using Python!"
-msg.attach(MIMEText(body, "plain"))
+    body = content
+    msg.attach(MIMEText(body, "plain"))
 
-# connect to gmail server
-server = smtplib.SMTP("smtp.gmail.com", 587)
-server.starttls()
+    # connect to gmail server (port 465 requires SMTP_SSL)
+    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
+        server.login(SENDER_EMAIL, password)
+        server.send_message(msg)
 
-# login
-server.login(sender_email, password)
 
-# send email
-server.send_message(msg)
-
-print("Email sent successfully!")
-
-server.quit()
+if __name__ == "__main__":
+    send_email(
+        receiver_email=RECEIVER_EMAIL,
+        subject="Test Email from Python",
+        content="Hello Varsha, this email is sent using Python!"
+    )
+    print("Email sent successfully!")
